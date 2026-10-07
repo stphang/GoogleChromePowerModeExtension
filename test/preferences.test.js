@@ -50,6 +50,7 @@ test('offers six distinct selectable pets and normalizes saved custom rosters', 
   assert.ok(PET_CATALOG.some((pet) => pet.id === 'anglerfish' && pet.name === 'Anglerfish'));
   assert.ok(PET_CATALOG.some((pet) => pet.id === 'crab' && pet.name === 'Big Crab'));
   assert.ok(PET_CATALOG.some((pet) => pet.id === 'sea-turtle' && pet.name === 'Sea Turtle'));
+  assert.ok(PET_CATALOG.some((pet) => pet.id === 'seahorse' && pet.name === 'Sea Horse'));
   assert.equal(PET_CATALOG.some(({ id }) => id === 'puddle' || id === 'sprout'), false);
   assert.equal(PET_CATALOG.some(({ id }) => id === 'lumen' || id === 'taro'), false);
   const storage = makeStorage({});
@@ -108,11 +109,11 @@ test('migrates replaced pet selections to their new ocean roster entries', async
   });
   assert.deepEqual(normalizePreferences({
     petMode: 'custom',
-    selectedPets: ['kitty', 'momo', 'kumo', 'puddle', 'sprout', 'lumen', 'taro'],
+    selectedPets: ['kitty', 'momo', 'kumo', 'nori', 'puddle', 'sprout', 'lumen', 'taro'],
   }), {
     powerMode: true,
     petMode: 'custom',
-    selectedPets: ['anglerfish', 'crab', 'sea-turtle'],
+    selectedPets: ['anglerfish', 'crab', 'sea-turtle', 'seahorse'],
   });
   assert.deepEqual(await savePreferences(makeStorage({}), { petMode: 'kitties' }), {
     powerMode: true,

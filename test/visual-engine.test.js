@@ -151,28 +151,72 @@ test('anglerfish, Big Crab, and oversized Sea Turtle render their own pixel art'
   }
 });
 
-test('Nori renders as a long-bodied sea dragon with a crested head, fins, and eye', () => {
+test('Sea Horse renders with an upright curved body, curled tail, and spotted gold coloring', () => {
   const harness = makeHarness({ random: () => 0.25 });
   harness.engine.setPreferences({
     powerMode: true,
     petMode: 'custom',
-    selectedPets: ['nori'],
+    selectedPets: ['seahorse'],
   });
 
   const colors = new Set(harness.pixelFills.map(({ color }) => color));
-  assert.ok(colors.has('#174b62'), 'the sea dragon has a dark teal outline');
-  assert.ok(colors.has('#287e8f'), 'the sea dragon has a rich blue-green body');
-  assert.ok(colors.has('#65cdb4'), 'the sea dragon has seafoam fin membranes');
-  assert.ok(colors.has('#eaffef'), 'the sea dragon has a clear bright eye');
+  assert.ok(colors.has('#563b32'), 'the sea horse has a deep brown outline');
+  assert.ok(colors.has('#e8a83e'), 'the sea horse has a warm golden body');
+  assert.ok(colors.has('#fff0b0'), 'the curled underside and snout have pale highlights');
+  assert.ok(colors.has('#a8663c'), 'the body has darker spotted markings');
+  assert.ok(colors.has('#f4e8bd'), 'the sea horse has a bright eye');
   const spritePixels = harness.pixelFills
-    .filter(({ color, rectangle }) => color !== '#174b62' && rectangle[2] === 3 && rectangle[3] === 3)
+    .filter(({ color, rectangle }) => color !== '#563b32' && rectangle[2] === 2 && rectangle[3] === 2)
     .map(({ rectangle }) => rectangle);
   const spriteWidth = Math.max(...spritePixels.map(([x, , width]) => x + width))
     - Math.min(...spritePixels.map(([x]) => x));
   const spriteHeight = Math.max(...spritePixels.map(([, y, , height]) => y + height))
     - Math.min(...spritePixels.map(([, y]) => y));
-  assert.ok(spriteWidth >= 80, 'the sea dragon has a distinct long serpentine silhouette');
-  assert.ok(spriteHeight >= 45, 'the head crest and trailing fins define its profile');
+  assert.ok(spriteHeight > spriteWidth, 'the sea horse has an upright silhouette');
+  assert.ok(spriteHeight >= 48, 'the curled tail and raised head define its profile');
+  harness.engine.destroy();
+});
+
+test('divers swim up from the roaming boundary above half height and leave as it contracts', () => {
+  const harness = makeHarness({ random: () => 0.25 });
+  harness.engine.setPreferences({ powerMode: true, petMode: 'goldfish', selectedPets: ['goldfish'] });
+  let time = 0;
+  function advanceFrames(count) {
+    for (let frame = 0; frame < count; frame += 1) {
+      time += 34;
+      harness.tick(time);
+    }
+  }
+  function diverPixels(color) {
+    return harness.pixelFills
+      .filter(({ color: fill }) => fill === color)
+      .map(({ rectangle }) => rectangle);
+  }
+
+  assert.equal(harness.engine.getActivityCounts().divers, 0);
+  harness.engine.addHit({ combo: 26, x: 24, y: 30 });
+  advanceFrames(90);
+  assert.ok(harness.clipHeights.at(-1) < 300);
+  assert.equal(harness.engine.getActivityCounts().divers, 0, 'divers wait until the roaming boundary passes halfway');
+
+  harness.engine.addHit({ combo: 27, x: 24, y: 30 });
+  advanceFrames(30);
+  assert.ok(harness.clipHeights.at(-1) > 300);
+  assert.equal(harness.engine.getActivityCounts().divers, 3, 'a small group of three divers appears');
+  const firstPose = diverPixels('#ffc98a');
+  const firstY = diverPixels('#178b9d').reduce((sum, [x, y]) => sum + y, 0) / diverPixels('#178b9d').length;
+  assert.ok(firstPose.length > 0, 'divers render animated arms and legs');
+  harness.pixelFills.length = 0;
+  advanceFrames(30);
+  const nextPose = diverPixels('#ffc98a');
+  const nextY = diverPixels('#178b9d').reduce((sum, [x, y]) => sum + y, 0) / diverPixels('#178b9d').length;
+  assert.notDeepEqual(nextPose, firstPose, 'divers move their hands and legs while swimming');
+  assert.ok(nextY < firstY, 'divers swim upward from the bottom of the roaming area');
+
+  harness.engine.resetCombo();
+  advanceFrames(80);
+  assert.ok(harness.clipHeights.at(-1) < 300);
+  assert.equal(harness.engine.getActivityCounts().divers, 0, 'divers leave as the area contracts below half height');
   harness.engine.destroy();
 });
 
@@ -357,6 +401,7 @@ test('a pixel whale and water splashes appear above one-third page height and le
   assert.deepEqual(harness.engine.getActivityCounts(), {
     pets: 6,
     schoolFish: 0,
+    divers: 0,
     inkBlots: 0,
     typingParticles: 0,
     whale: false,
@@ -481,7 +526,7 @@ test('only selected pet types are active and an empty roster turns pets off', ()
   harness.engine.setPreferences({
     powerMode: true,
     petMode: 'custom',
-    selectedPets: ['nori'],
+    selectedPets: ['seahorse'],
   });
   assert.equal(harness.engine.getActivityCounts().pets, 6);
   harness.engine.setPreferences({

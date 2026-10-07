@@ -10,6 +10,7 @@
   const SCHOOL_FISH_SPAWN_RATE = 90;
   const MAX_INK_BLOTS = 24;
   const MAX_WHALE_SPLASH_DROPLETS = 18;
+  const MAX_DIVERS = 3;
   const MAX_TYPING_PARTICLES = 150;
   const MIN_ROAMING_HEIGHT = 60;
   const COMBO_TO_FULL_PAGE = 60;
@@ -24,7 +25,7 @@
     'octopus',
     'crab',
     'sea-turtle',
-    'nori',
+    'seahorse',
   ]);
 
   function centerSpriteRows(rows) {
@@ -120,24 +121,37 @@
       '   HHH                      HHH   ',
       '                                  ',
     ]),
-    nori: [
-      '',
-      '                          SGSSGS',
-      '                         SGSSSSGS',
-      '                         SGSSSSSGS',
-      '                        SGSSSSSSST',
-      '     SSSS                  GGTTTTTT',
-      '   SGSSSSS                  TGGTTWTT',
-      '  TGTTTTTT     CCC  CCC CC TTTGGTBTTT',
-      ' SGSSSSSSTTTTTDDDDCCDDCCDDTTTTTGGTTTTT',
-      '  TGTTTTTTTTTTTDDDDCCDDDCCDTT  TTTTTTT',
-      '   SGSSSSS TTTGGGGGGGGGDDDT     TTTTT',
-      '     TGTTT    TTGGGGGGDD SSSS',
-      '       SSSS   SSSSGGSSSS  TTTT',
-      '             TTTTT   TTTT  SSS',
-      '             SSSS     SSS  TT',
-      '              TT      TT',
-    ].map((row) => row.padEnd(40)),
+    seahorse: [
+      '          HHHH          ',
+      '         HHHHHH         ',
+      '       HHHGGGGG         ',
+      '      GGGGSSGGGG        ',
+      '    FGGGGWBGGGGGG       ',
+      '      GGGGGGGGGGSS      ',
+      '        GGGGGGSSGGGG    ',
+      '         GGGGGGGGGGGG   ',
+      '          GGGSSGGGGGGG  ',
+      '         GGGGGGGGGGGGFF ',
+      '       CCGGGSSGGGGGGGG   ',
+      '      CCCCCCGGGGGGGGG    ',
+      '       CCCCCGGGGGGGG     ',
+      '          CCCGGGGG       ',
+      '        FFFCGGGGG        ',
+      '      FFFFFGGGGG         ',
+      '    FFFFFFGGGGG          ',
+      '   FFFFFFGGGG            ',
+      '    FFFFGGGG             ',
+      '      GGGG               ',
+      '       GGGGG             ',
+      '          GGGG           ',
+      '             GGG         ',
+      '               GGG       ',
+      '              GGGG       ',
+      '            GGGGG        ',
+      '          GGGGGG         ',
+      '         GGGGG           ',
+      '          GGG             ',
+    ],
   };
   const WHALE = [
     '             BBBBB              ',
@@ -173,30 +187,31 @@
     anglerfish: { F: '#e99c32', L: '#ffe06d', O: '#fff0a0', W: '#fff8df', D: '#4b3340', C: '#bd5362', R: '#e77f35' },
     crab: { R: '#d94a3d', C: '#a93238', W: '#fff5d8', B: '#392c3c' },
     'sea-turtle': { G: '#347f58', C: '#3f7f39', H: '#66b84a', L: '#72ad47', W: '#fff4a8', B: '#143b2c', P: '#d6e58b' },
-    nori: { T: '#287e8f', D: '#236679', G: '#70d5b7', S: '#65cdb4', C: '#a3eee0', W: '#eaffef', B: '#143244' },
+    seahorse: { G: '#e8a83e', S: '#a8663c', C: '#fff0b0', F: '#d97948', H: '#f2c96b', W: '#f4e8bd', B: '#342e39' },
   };
   const PET_OUTLINES = {
     goldfish: '#713820',
     anglerfish: '#653d2c',
     crab: '#702b37',
     'sea-turtle': '#143b2c',
-    nori: '#174b62',
+    seahorse: '#563b32',
+    diver: '#15364d',
   };
   const PET_HIGHLIGHTS = {
     goldfish: '#fff0a0',
     anglerfish: '#ffe06d',
     crab: '#ff9c73',
     'sea-turtle': '#a2df8d',
-    nori: '#b5fff0',
+    seahorse: '#ffdb83',
   };
   const PET_EYES = {
     goldfish: [8],
     anglerfish: [4],
     crab: [4, 9],
     'sea-turtle': [29],
-    nori: [3, 9],
+    seahorse: [9],
   };
-  const PET_SCALES = Object.freeze({ crab: 4, 'sea-turtle': 3 });
+  const PET_SCALES = Object.freeze({ crab: 4, 'sea-turtle': 3, seahorse: 2 });
 
   function createVisualEngine(canvas, options) {
     const context = canvas.getContext('2d', { alpha: true });
@@ -211,6 +226,7 @@
     let reducedMotion = options.reducedMotion;
     const pets = [];
     const schoolFish = [];
+    const divers = [];
     const inkBlots = [];
     const whaleSplashDroplets = [];
     const typingParticles = [];
@@ -251,7 +267,7 @@
 
     function hasWater() {
       const types = allowedPetTypes();
-      return types.includes('octopus') || types.includes('nori');
+      return types.includes('octopus') || types.includes('seahorse');
     }
 
     function speedMultiplier() {
@@ -291,6 +307,33 @@
 
     function canShowFishSchool() {
       return pets.length > 0 && !reducedMotion && roamingHeight > height * FISH_SCHOOL_THRESHOLD;
+    }
+
+    function canShowDivers() {
+      return pets.length > 0 && !reducedMotion && roamingHeight > height / 2;
+    }
+
+    function createDiver(index) {
+      return {
+        x: width * (index + 1) / (MAX_DIVERS + 1),
+        y: roamingHeight - 16 - index * 5,
+        phase: randomBetween(0, Math.PI * 2),
+        speed: randomBetween(25, 34),
+      };
+    }
+
+    function updateDivers(deltaSeconds) {
+      if (!canShowDivers()) {
+        divers.length = 0;
+        return;
+      }
+      while (divers.length < MAX_DIVERS) divers.push(createDiver(divers.length));
+      for (const diver of divers) {
+        diver.y -= diver.speed * deltaSeconds;
+        diver.x += Math.sin(elapsed * 0.7 + diver.phase) * 10 * deltaSeconds;
+        if (diver.y < roamingHeight * 0.18) diver.y = roamingHeight - 16;
+        diver.x = Math.max(24, Math.min(width - 24, diver.x));
+      }
     }
 
     function createSchoolFish() {
@@ -387,6 +430,7 @@
       if (types.length === 0 || reducedMotion) {
         pets.length = 0;
         schoolFish.length = 0;
+        divers.length = 0;
         fishSpawnAccumulator = 0;
         inkBlots.length = 0;
         updateWhales();
@@ -396,6 +440,7 @@
         const type = types[Math.floor(random() * types.length)];
         pets.push(createPet(type, randomBetween(0, Math.max(width, 1))));
       }
+      updateDivers(0);
       updateWhales();
     }
 
@@ -452,6 +497,7 @@
       roamingHeight += Math.sign(heightDifference) * Math.min(Math.abs(heightDifference), heightChange);
       updateWhales();
       updateFishSchool(deltaSeconds);
+      updateDivers(deltaSeconds);
       for (const pet of pets) {
         pet.x += pet.speed * speedMultiplier() * pet.direction * deltaSeconds;
         const halfHeight = petHalfHeight(pet.type);
@@ -557,6 +603,26 @@
         context.quadraticCurveTo(x + Math.sin(time * 0.0015 + blade) * 12, roamingHeight * 0.7, x - 8, roamingHeight * 0.62);
         context.stroke();
       }
+    }
+
+    function drawSeaHorse(pet, time) {
+      const pattern = PETS.seahorse;
+      const scale = petScale('seahorse');
+      const widthInPixels = Math.max(...pattern.map((row) => row.length));
+      const originX = Math.round(pet.x - widthInPixels * scale / 2);
+      const originY = Math.round(pet.y - pattern.length * scale / 2 + Math.sin(time * 0.004 + pet.x) * 1.5);
+      const finWave = Math.sin(time * 0.01 + pet.x * 0.02);
+      context.fillStyle = '#d97948';
+      for (let ray = 0; ray < 3; ray += 1) {
+        context.fillRect(originX + scale * (22 + ray) + finWave * 2, originY + scale * (9 + ray), scale * 2, scale);
+      }
+      drawPixelPet('seahorse', pet.x, pet.y, time);
+      context.fillStyle = '#c87843';
+      context.fillRect(originX + scale * 11, originY + scale * 18, scale * 3, scale);
+      context.fillRect(originX + scale * 10, originY + scale * 19, scale * 3, scale);
+      context.fillRect(originX + scale * 9, originY + scale * 20, scale * 3, scale);
+      context.fillRect(originX + scale * 10, originY + scale * 21, scale * 3, scale);
+      context.fillRect(originX + scale * 12, originY + scale * 21, scale * 2, scale);
     }
 
     function drawSchoolFish(time) {
@@ -678,6 +744,55 @@
       drawPixelPet(type, pet.x, pet.y, time);
       drawSeaTurtleFlipper(originX + scale * 9, originY + scale * 10, -0.58 + Math.sin(stroke) * 0.58, scale, '#82c94f');
       drawSeaTurtleFlipper(originX + scale * 20, originY + scale * 10, 0.58 + Math.sin(stroke + Math.PI) * 0.58, scale, '#74b83f');
+    }
+
+    function drawDiverLimb(startX, startY, endX, endY, color, pixelSize) {
+      for (let step = 0; step <= 4; step += 1) {
+        const progress = step / 4;
+        const x = Math.round(startX + (endX - startX) * progress);
+        const y = Math.round(startY + (endY - startY) * progress);
+        context.fillStyle = PET_OUTLINES.diver;
+        context.fillRect(x - pixelSize / 2 - 1, y - pixelSize / 2 - 1, pixelSize + 2, pixelSize + 2);
+        context.fillStyle = color;
+        context.fillRect(x - pixelSize / 2, y - pixelSize / 2, pixelSize, pixelSize);
+      }
+    }
+
+    function drawDiver(diver, time) {
+      const x = Math.round(diver.x);
+      const y = Math.round(diver.y);
+      const stroke = time * 0.008 + diver.phase;
+      const armSwing = Math.sin(stroke) * 5;
+      const kick = Math.sin(stroke + Math.PI / 2) * 5;
+
+      context.shadowColor = '#15364d';
+      context.shadowBlur = 3;
+      drawDiverLimb(x - 3, y - 4, x - 9 - armSwing, y - 9, '#ffc98a', 3);
+      drawDiverLimb(x + 3, y - 4, x + 9 + armSwing, y - 9, '#ffc98a', 3);
+      drawDiverLimb(x - 2, y + 5, x - 5 - kick, y + 13, '#153e62', 4);
+      drawDiverLimb(x + 2, y + 5, x + 5 + kick, y + 13, '#153e62', 4);
+
+      context.fillStyle = '#db5348';
+      context.fillRect(x + 4, y - 7, 5, 12);
+      context.fillStyle = '#fff0b0';
+      context.fillRect(x + 3, y - 7, 2, 12);
+      context.fillStyle = PET_OUTLINES.diver;
+      context.fillRect(x - 4, y - 6, 9, 14);
+      context.fillStyle = '#178b9d';
+      context.fillRect(x - 3, y - 5, 7, 12);
+      context.fillStyle = '#31c1c0';
+      context.fillRect(x - 2, y - 4, 2, 8);
+
+      context.fillStyle = PET_OUTLINES.diver;
+      context.fillRect(x - 4, y - 15, 9, 8);
+      context.fillStyle = '#ffc98a';
+      context.fillRect(x - 3, y - 14, 7, 6);
+      context.fillStyle = '#f4e8bd';
+      context.fillRect(x - 4, y - 15, 9, 3);
+      context.fillRect(x - 2, y - 17, 5, 2);
+      context.fillStyle = '#56dfe5';
+      context.fillRect(x, y - 12, 4, 2);
+      context.shadowBlur = 0;
     }
 
     function drawOctopus(pet, time) {
@@ -906,9 +1021,11 @@
       for (const pet of pets) {
         if (pet.type === 'octopus') drawOctopus(pet, time);
         else if (pet.type === 'sea-turtle') drawSeaTurtle(pet, time);
+        else if (pet.type === 'seahorse') drawSeaHorse(pet, time);
         else drawPixelPet(pet.type, pet.x, pet.y, time);
       }
       drawSchoolFish(time);
+      for (const diver of divers) drawDiver(diver, time);
       drawWhale(time);
       drawWhaleVisitor(whaleShark, time, 'shark');
       drawWhaleVisitor(blueWhale, time, 'blue');
@@ -1047,6 +1164,7 @@
       return {
         pets: pets.length,
         schoolFish: schoolFish.length,
+        divers: divers.length,
         inkBlots: inkBlots.length,
         typingParticles: typingParticles.length,
         whale: whale !== null,
@@ -1062,6 +1180,7 @@
       if (reducedMotion) {
         pets.length = 0;
         schoolFish.length = 0;
+        divers.length = 0;
         fishSpawnAccumulator = 0;
         inkBlots.length = 0;
         typingParticles.length = 0;
@@ -1085,6 +1204,7 @@
       document.removeEventListener('visibilitychange', onVisibilityChange);
       pets.length = 0;
       schoolFish.length = 0;
+      divers.length = 0;
       inkBlots.length = 0;
       whale = null;
       whaleShark = null;

@@ -10,7 +10,7 @@
     { id: 'octopus', name: 'Octopus', glyph: '🐙' },
     { id: 'crab', name: 'Big Crab', glyph: '🦀' },
     { id: 'sea-turtle', name: 'Sea Turtle', glyph: '🐢' },
-    { id: 'nori', name: 'Nori · Sea Dragon', glyph: '🐉' },
+    { id: 'seahorse', name: 'Sea Horse', glyph: '🐠' },
   ]);
   const PET_IDS = Object.freeze(PET_CATALOG.map((pet) => pet.id));
   const PET_MODES = Object.freeze(['all', 'goldfish-anglerfish', 'goldfish', 'anglerfish', 'octopus', 'off', 'custom']);
@@ -27,6 +27,7 @@
     kitty: 'anglerfish',
     momo: 'crab',
     kumo: 'sea-turtle',
+    nori: 'seahorse',
   });
   const LEGACY_PET_MODES = Object.freeze({
     'corgis-kitties': 'goldfish-anglerfish',
