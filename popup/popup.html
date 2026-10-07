@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Developer Power Mode Combo</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="panel">
+      <header class="heading">
+        <span class="eyebrow">LOCAL ARCADE</span>
+        <h1>Developer Power Mode</h1>
+      </header>
+
+      <label class="power-row" for="power-mode">
+        <span><strong>Power Mode</strong><small>Combo sparks + faster pets</small></span>
+        <input id="power-mode" type="checkbox" role="switch" checked>
+      </label>
+
+      <section class="pets" aria-labelledby="pets-heading">
+        <h2 id="pets-heading">Your tiny crew</h2>
+        <div class="previews">
+          <figure>
+            <svg viewBox="0 0 48 38" role="img" aria-label="Pixel-art goldfish">
+              <g shape-rendering="crispEdges">
+                <path fill="#c96b26" d="M5 17h7v-7h5v8h4v12h-4v8h-5v-7H5v-5H2v-7h3z"/>
+                <path fill="#c96b26" d="M22 9V5h5V2h7v6h-5v4h-7zM29 28h7v5h-4v5h-6v-6h3z"/>
+                <path fill="#f3a832" d="M16 12h5V9h16v4h5v15h-5v4H21v-3h-5z"/>
+                <path fill="#ffe27a" d="M21 13h5v3h-5zm8 1h5v3h-5zm-3 6h5v3h-5zm8 0h4v3h-4z"/>
+                <path fill="#fff4d0" d="M37 15h5v6h-5z"/>
+                <path fill="#3b2934" d="M40 16h2v4h-2z"/>
+                <path fill="#ef7832" d="M18 25h3v5h-3z"/>
+              </g>
+            </svg>
+            <figcaption>Goldfish</figcaption>
+          </figure>
+          <figure>
+            <svg viewBox="0 0 48 38" role="img" aria-label="Pixel-art anglerfish">
+              <g shape-rendering="crispEdges">
+                <path fill="#ffe06d" d="M24 2h3v10h-3zM22 11h7v4h-7z"/>
+                <path fill="#e99c32" d="M16 15h22v15H17v-3h-4v-9h3z"/>
+                <path fill="#bd5362" d="M13 19h-5v6h5z"/>
+                <path fill="#fff8df" d="M33 18h5v6h-5z"/>
+                <path fill="#4b3340" d="M35 19h2v4h-2z"/>
+                <path fill="#fff0a0" d="M19 16h13v2H19zM21 23h6v2h-6z"/>
+                <path fill="#e77f35" d="M20 30h5v3h-5zm12 0h5v3h-5z"/>
+              </g>
+            </svg>
+            <figcaption>Anglerfish</figcaption>
+          </figure>
+          <figure>
+            <svg viewBox="0 0 48 38" role="img" aria-label="Pixel-art big crab">
+              <g shape-rendering="crispEdges">
+                <path fill="#a93238" d="M8 8h5v5H8zm27 0h5v5h-5zM9 12h4v7H9zm26 0h4v7h-4z"/>
+                <path fill="#702b37" d="M12 18h5v4h-5zm19 0h5v4h-5z"/>
+                <path fill="#d94a3d" d="M16 14h18v15h-4v4h-9v-4h-5z"/>
+                <path fill="#fff5d8" d="M19 18h4v5h-4zm10 0h4v5h-4z"/>
+                <path fill="#392c3c" d="M20 20h2v4h-2zm10 0h2v4h-2z"/>
+                <path fill="#ff9c73" d="M18 15h12v2H18zM14 24h4v3h-4zm18 0h4v3h-4z"/>
+                <path fill="#d94a3d" d="M8 25h10v3H8zm22 0h10v3H30zM11 30h9v3h-9zm17 0h9v3h-9z"/>
+              </g>
+            </svg>
+            <figcaption>Big Crab</figcaption>
+          </figure>
+          <figure>
+            <svg viewBox="0 0 48 38" role="img" aria-label="Pixel-art sea turtle">
+              <g shape-rendering="crispEdges">
+                <path fill="#244e43" d="M21 4h8v5h-8zM17 9h16v5H17z"/>
+                <path fill="#64ad70" d="M19 3h11v5H19z"/>
+                <path fill="#244e43" d="M10 11h28v17H10z"/>
+                <path fill="#347f58" d="M13 12h22v14H13z"/>
+                <path fill="#b57b4b" d="M19 13h5v4h-5zm7 0h5v4h-5zm-7 6h5v4h-5zm7 0h5v4h-5z"/>
+                <path fill="#a2df8d" d="M6 12h6v8H6zm30 0h6v8h-6zM12 27h8v5h-8zm16 0h8v5h-8z"/>
+                <path fill="#fff5d8" d="M23 5h2v2h-2z"/>
+              </g>
+            </svg>
+            <figcaption>Sea Turtle</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <label class="mode-label" for="pet-mode">Pet preset</label>
+      <select id="pet-mode">
+        <option value="all">All pets</option>
+        <option value="goldfish-anglerfish">Goldfish &amp; Anglerfish</option>
+        <option value="goldfish">Goldfish</option>
+        <option value="anglerfish">Anglerfish</option>
+        <option value="octopus">Octopus</option>
+        <option value="off">Off</option>
+        <option value="custom">Custom selection</option>
+      </select>
+      <fieldset class="roster">
+        <legend>Choose who appears</legend>
+        <div class="roster-actions">
+          <button id="select-all" type="button">All six</button>
+          <button id="select-none" type="button">Clear</button>
+        </div>
+        <div id="pet-options" class="pet-options"></div>
+      </fieldset>
+      <p class="privacy">Runs on HTTP/HTTPS pages. Typed text stays on your device.</p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+    <script src="../src/preferences.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "developer-power-mode-combo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-only Chrome MV3 typing combo and pixel-pet extension",
+  "scripts": {
+    "test": "node --test"
+  }
+}

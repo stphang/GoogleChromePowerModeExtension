@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Developer Power Mode Combo",
+  "version": "1.0.0",
+  "description": "A local-only typing combo counter with tiny animated pixel pets.",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Developer Power Mode Combo",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["src/preferences.js", "src/edit-tracker.js", "src/visual-engine.js", "src/overlay-runtime.js", "src/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
